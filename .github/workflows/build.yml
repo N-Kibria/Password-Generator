@@ -1,20 +1,27 @@
-- name: Compile Java
+- name: Download JUnit
+  run: |
+    wget https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-api/5.9.2/junit-jupiter-api-5.9.2.jar -O junit-api.jar
+    wget https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-engine/5.9.2/junit-jupiter-engine-5.9.2.jar -O junit-engine.jar
+    wget https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.9.2/junit-platform-console-standalone-1.9.2.jar -O junit-standalone.jar
+    wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar -O jacoco-agent.jar
+    wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.11/org.jacoco.cli-0.8.11-nodeps.jar -O jacoco-cli.jar
+
+- name: Compile Java with Tests
   run: |
     mkdir -p "Password Generator/bin"
-    javac -d "Password Generator/bin" \
+    javac -cp junit-api.jar -d "Password Generator/bin" \
       "Password Generator/src/Alphabet.java" \
       "Password Generator/src/Generator.java" \
       "Password Generator/src/Password.java" \
-      "Password Generator/src/Main.java"
+      "Password Generator/src/Main.java" \
+      "Password Generator/src/GeneratorTest.java"
 
 - name: Run Tests with JaCoCo
   run: |
-    # Download JaCoCo
-    wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.11/org.jacoco.agent-0.8.11-runtime.jar -O jacoco-agent.jar
-    wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.11/org.jacoco.cli-0.8.11-nodeps.jar -O jacoco-cli.jar
-    # Run with JaCoCo agent
-    java -javaagent:jacoco-agent.jar=destfile=jacoco.exec -cp "Password Generator/bin" Main || true
-    # Generate XML report
+    java -javaagent:jacoco-agent.jar=destfile=jacoco.exec \
+      -cp "Password Generator/bin":junit-standalone.jar \
+      org.junit.platform.console.ConsoleLauncher \
+      --scan-classpath || true
     java -jar jacoco-cli.jar report jacoco.exec \
       --classfiles "Password Generator/bin" \
       --sourcefiles "Password Generator/src" \
