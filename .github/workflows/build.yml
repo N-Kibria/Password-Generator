@@ -28,9 +28,3 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.projectKey=N-Kibria_Password-Generator
-            -Dsonar.organization=n-kibria
-            -Dsonar.sources=src
-            -Dsonar.java.binaries=bin
