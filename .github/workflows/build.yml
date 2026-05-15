@@ -16,7 +16,13 @@ jobs:
           java-version: 17
           distribution: 'zulu'
       - name: Compile Java
-        run: javac -d "Password Generator/bin" "Password Generator/src/"*.java
+        run: |
+          mkdir -p "Password Generator/bin"
+          javac -d "Password Generator/bin" \
+            "Password Generator/src/Alphabet.java" \
+            "Password Generator/src/Generator.java" \
+            "Password Generator/src/Password.java" \
+            "Password Generator/src/Main.java"
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
